@@ -68,6 +68,28 @@ public class EasyPermissions {
     }
 
     /**
+     * Request a set of permission, showing
+     * @param context     Activity or Fragment requesting permissions. Should implement
+     *                    {@link android.support.v4.app.ActivityCompat.OnRequestPermissionsResultCallback}
+     *                    or
+     *                    {@link android.support.v13.app.FragmentCompat.OnRequestPermissionsResultCallback}
+     * @param requestCode request code to track this request, must be < 256.
+     * @param perms       a set of permissions to be requested.
+     */
+    public static void requestPermissions(Context context, int requestCode, final String... perms) {
+        checkCallingObjectSuitability(context);
+        List<String> permList = new ArrayList<>();
+        for (String perm : perms) {
+            if (ContextCompat.checkSelfPermission(context, perm) == PackageManager.PERMISSION_DENIED) {
+                permList.add(perm);
+            }
+        }
+        if (permList.size() > 0) {
+            executePermissionsRequest(context, permList.toArray(new String[permList.size()]), requestCode);
+        }
+    }
+
+    /**
      * Request a set of permissions, showing rationale if the system requests it.
      *
      * @param object      Activity or Fragment requesting permissions. Should implement
@@ -79,8 +101,7 @@ public class EasyPermissions {
      * @param requestCode request code to track this request, must be < 256.
      * @param perms       a set of permissions to be requested.
      */
-    public static void requestPermissions(final Object object, String rationale,
-                                          final int requestCode, final String... perms) {
+    public static void requestPermissions(final Object object, String rationale, final int requestCode, final String... perms) {
         requestPermissions(object, rationale,
                 android.R.string.ok,
                 android.R.string.cancel,
